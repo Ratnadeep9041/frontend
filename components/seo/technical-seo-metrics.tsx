@@ -76,8 +76,6 @@ export function TechnicalSEOMetrics({ data }: { data: SEOAuditData }) {
     )
   }
 
-
-
   return (
     <div className="space-y-6">
       {/* Sitemap, Robots & Canonical */}
@@ -224,7 +222,7 @@ export function TechnicalSEOMetrics({ data }: { data: SEOAuditData }) {
                 Current Schema Markup
               </h4>
               <pre className="bg-muted p-4 rounded text-xs overflow-x-auto text-foreground max-h-96">
-                <code>{data.technical.schemaValidation.currentSchema}</code>
+                <code>{JSON.stringify(JSON.parse(data.technical.schemaValidation.currentSchema), null, 2)}</code>
               </pre>
             </div>
           )}
