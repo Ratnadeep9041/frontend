@@ -163,32 +163,6 @@ export function LinksAndImagesAnalysis({ data }: { data: SEOAuditData }) {
           </div>
         )}
       </Card>
-
-      {/* Best Practices for Links & Images */}
-      <Card className="p-6 border-purple-200 dark:border-purple-800 bg-purple-50 dark:bg-purple-950">
-        <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-          <Info className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-          Best Practices
-        </h3>
-        <div className="space-y-3 text-sm text-foreground">
-          <div className="flex items-start gap-2">
-            <span className="text-purple-600 dark:text-purple-400 font-bold">1.</span>
-            <span>Use descriptive anchor text for internal links (avoid "click here")</span>
-          </div>
-          <div className="flex items-start gap-2">
-            <span className="text-purple-600 dark:text-purple-400 font-bold">2.</span>
-            <span>Link to authoritative, relevant external sources with high domain authority</span>
-          </div>
-          <div className="flex items-start gap-2">
-            <span className="text-purple-600 dark:text-purple-400 font-bold">3.</span>
-            <span>Write descriptive alt text (50-125 characters) for all images</span>
-          </div>
-          <div className="flex items-start gap-2">
-            <span className="text-purple-600 dark:text-purple-400 font-bold">4.</span>
-            <span>Optimize image file sizes and use modern formats (WebP, AVIF)</span>
-          </div>
-        </div>
-      </Card>
     </div>
   )
 }

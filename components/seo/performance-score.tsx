@@ -55,36 +55,7 @@ export function PerformanceScores({ data }: { data: SEOAuditData }) {
         <IssueCard title="Best Practices" items={data.bestPractices.issues} />
       </div>
 
-      {/* Detailed Improvement Guide */}
-      <Card className="p-6 border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950">
-        <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-          <AlertCircle className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-          How to Improve
-        </h3>
-        <div className="space-y-4">
-          <div>
-            <h4 className="text-sm font-medium text-foreground mb-2">Performance Tips</h4>
-            <ul className="space-y-1.5 text-sm text-foreground">
-              <li className="flex items-start gap-2">
-                <span className="text-blue-600 dark:text-blue-400">→</span>
-                <span>Compress and optimize all images (use WebP format)</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-blue-600 dark:text-blue-400">→</span>
-                <span>Minify and defer non-critical JavaScript</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-blue-600 dark:text-blue-400">→</span>
-                <span>Enable GZIP compression on server</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-blue-600 dark:text-blue-400">→</span>
-                <span>Implement lazy loading for images and content</span>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </Card>
+     
     </div>
   )
 }
