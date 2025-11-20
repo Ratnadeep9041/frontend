@@ -17,7 +17,7 @@ export interface SEOAuditData {
   technical: {
     sitemapPresent: boolean
     robotsTextPresent: boolean
-    canonicalTagPresent: boolean
+    canonicalTag: { present: boolean, url: string | null }
     schemaMarkup: string[]
     schemaValidation: {
       valid: boolean

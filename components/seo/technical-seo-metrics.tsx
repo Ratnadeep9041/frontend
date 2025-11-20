@@ -10,7 +10,7 @@ interface SEOAuditData {
   technical: {
     sitemapPresent: boolean
     robotsTextPresent: boolean
-    canonicalTagPresent: boolean
+    canonicalTag: { present: boolean, url: string | null }
     schemaMarkup: string[]
     schemaValidation: {
       valid: boolean
@@ -182,12 +182,12 @@ if (rawArray && rawArray.length > 0) {
               <h3 className="font-semibold text-foreground mb-1">Canonical Tag</h3>
               <p className="text-sm text-muted-foreground">Duplicate prevention</p>
             </div>
-            <StatusIcon present={data.technical.canonicalTagPresent} />
+            <StatusIcon present={data.technical.canonicalTag.present} />
           </div>
           <p className="text-xs text-muted-foreground">
-            {data.technical.canonicalTagPresent
-              ? 'Canonical tag present'
-              : 'No canonical tag found. Add one to specify the preferred URL.'}
+          {data.technical.canonicalTag.present
+              ? `Canonical tag present: ${data.technical.canonicalTag.url || 'URL not available'}`
+              : 'No canonical tag found. Add one to specify the preferred URL.'}  
           </p>
         </Card>
       </div>
