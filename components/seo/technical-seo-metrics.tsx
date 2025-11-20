@@ -2,6 +2,7 @@
 
 import { Card } from '@/components/ui/card'
 import { CheckCircle2, XCircle, AlertCircle, Info } from 'lucide-react'
+import { SchemaFullView } from './schema-full-view'
 
 interface SEOAuditData {
   url: string
@@ -15,7 +16,7 @@ interface SEOAuditData {
       valid: boolean
       errors: number
       warnings: number
-      currentSchema: string
+      currentSchema: string[]
       improvements: string[]
     } | null
     statusCodes: {
@@ -76,8 +77,73 @@ export function TechnicalSEOMetrics({ data }: { data: SEOAuditData }) {
     )
   }
 
+  let schemas = [];
+  let schemaCount = 0;
+  const rawArray = data.technical.schemaValidation?.currentSchema;
+
+if (rawArray && rawArray.length > 0) {
+ 
+  rawArray.forEach(item => {
+    let parsed = typeof item === "string" ? JSON.parse(item) : item;
+    if (Array.isArray(parsed["@graph"])) {
+      schemas.push(...parsed["@graph"]);
+    } else if (typeof parsed === "object") {
+      schemas.push(parsed);
+    }
+  });
+
+   schemaCount = schemas.length;
+  console.log("Total schemas:", schemaCount);
+}
   return (
     <div className="space-y-6">
+
+       {/* Meta Tags */}
+       <Card className="p-6">
+        <h3 className="font-semibold text-foreground mb-4">Meta Tags</h3>
+        <div className="space-y-6">
+          <div>
+            <h4 className="text-sm font-medium text-foreground mb-3">Title Tag</h4>
+            <div className="space-y-2">
+              <div>
+                <p className="text-xs text-muted-foreground mb-1">Current</p>
+                <p className="text-sm text-foreground line-clamp-2">
+                  {data.meta.original.title}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs font-medium text-green-600 dark:text-green-400 mb-1">
+                  ✓ Improved
+                </p>
+                <p className="text-sm text-green-600 dark:text-green-400">
+                  {data.meta.improved.title}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="border-t border-border pt-6">
+            <h4 className="text-sm font-medium text-foreground mb-3">Meta Description</h4>
+            <div className="space-y-2">
+              <div>
+                <p className="text-xs text-muted-foreground mb-1">Current</p>
+                <p className="text-sm text-foreground line-clamp-2">
+                  {data.meta.original.description}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs font-medium text-green-600 dark:text-green-400 mb-1">
+                  ✓ Improved
+                </p>
+                <p className="text-sm text-green-600 dark:text-green-400">
+                  {data.meta.improved.description}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Card>
+
       {/* Sitemap, Robots & Canonical */}
       <div className="grid md:grid-cols-3 gap-4">
         <Card className="p-6">
@@ -90,8 +156,8 @@ export function TechnicalSEOMetrics({ data }: { data: SEOAuditData }) {
           </div>
           <p className="text-xs text-muted-foreground">
             {data.technical.sitemapPresent
-              ? 'Sitemap found. Search engines can easily discover all pages.'
-              : 'No sitemap found. Create one to help search engines crawl your site.'}
+              ? 'Url present in sitemap. Search engines can easily this page.'
+              : 'Url not present in sitemap. Create one to help search engines crawl your site.'}
           </p>
         </Card>
 
@@ -120,7 +186,7 @@ export function TechnicalSEOMetrics({ data }: { data: SEOAuditData }) {
           </div>
           <p className="text-xs text-muted-foreground">
             {data.technical.canonicalTagPresent
-              ? 'Canonical tag present. Prevents duplicate content issues.'
+              ? 'Canonical tag present'
               : 'No canonical tag found. Add one to specify the preferred URL.'}
           </p>
         </Card>
@@ -133,15 +199,13 @@ export function TechnicalSEOMetrics({ data }: { data: SEOAuditData }) {
           {/* Schema Status Overview */}
           <div className="grid md:grid-cols-3 gap-4 mb-6">
             <div className="bg-muted p-4 rounded-lg">
-              <p className="text-sm text-muted-foreground mb-1">Types Found</p>
+              <p className="text-sm text-muted-foreground mb-1">Schemas Found</p>
               <p className="text-2xl font-bold text-foreground">
-                {data.technical.schemaMarkup.length}
+                {schemaCount}
               </p>
               <p className="text-xs text-muted-foreground mt-2">
-                {data.technical.schemaMarkup.length === 0
-                  ? 'No schema markup detected'
-                  : data.technical.schemaMarkup.join(', ')}
-              </p>
+                    Schemas Found
+                  </p>
             </div>
 
             {data.technical.schemaValidation && (
@@ -197,8 +261,14 @@ export function TechnicalSEOMetrics({ data }: { data: SEOAuditData }) {
             )}
           </div>
 
-          {/* Schema Improvements */}
-          {data.technical.schemaValidation?.improvements &&
+          {/* Current Schema */}
+
+           {data.technical.schemaValidation?.currentSchema && (
+            <SchemaFullView data={data.technical.schemaValidation.currentSchema}/>
+          )}
+
+           {/* Schema Improvements */}
+           {data.technical.schemaValidation?.improvements &&
             data.technical.schemaValidation.improvements.length > 0 && (
               <div className="space-y-3 border-t border-border pt-6">
                 <h4 className="text-sm font-medium text-foreground">Improvements</h4>
@@ -214,64 +284,6 @@ export function TechnicalSEOMetrics({ data }: { data: SEOAuditData }) {
                 )}
               </div>
             )}
-
-          {/* Current Schema */}
-          {data.technical.schemaValidation?.currentSchema && (
-            <div className="border-t border-border pt-6">
-              <h4 className="text-sm font-medium text-foreground mb-3">
-                Current Schema Markup
-              </h4>
-              <pre className="bg-muted p-4 rounded text-xs overflow-x-auto text-foreground max-h-96">
-                <code>{JSON.stringify(JSON.parse(data.technical.schemaValidation.currentSchema), null, 2)}</code>
-              </pre>
-            </div>
-          )}
-        </div>
-      </Card>
-
-      {/* Meta Tags */}
-      <Card className="p-6">
-        <h3 className="font-semibold text-foreground mb-4">Meta Tags</h3>
-        <div className="space-y-6">
-          <div>
-            <h4 className="text-sm font-medium text-foreground mb-3">Title Tag</h4>
-            <div className="space-y-2">
-              <div>
-                <p className="text-xs text-muted-foreground mb-1">Current</p>
-                <p className="text-sm text-foreground line-clamp-2">
-                  {data.meta.original.title}
-                </p>
-              </div>
-              <div>
-                <p className="text-xs font-medium text-green-600 dark:text-green-400 mb-1">
-                  ✓ Improved
-                </p>
-                <p className="text-sm text-green-600 dark:text-green-400">
-                  {data.meta.improved.title}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="border-t border-border pt-6">
-            <h4 className="text-sm font-medium text-foreground mb-3">Meta Description</h4>
-            <div className="space-y-2">
-              <div>
-                <p className="text-xs text-muted-foreground mb-1">Current</p>
-                <p className="text-sm text-foreground line-clamp-2">
-                  {data.meta.original.description}
-                </p>
-              </div>
-              <div>
-                <p className="text-xs font-medium text-green-600 dark:text-green-400 mb-1">
-                  ✓ Improved
-                </p>
-                <p className="text-sm text-green-600 dark:text-green-400">
-                  {data.meta.improved.description}
-                </p>
-              </div>
-            </div>
-          </div>
         </div>
       </Card>
 
