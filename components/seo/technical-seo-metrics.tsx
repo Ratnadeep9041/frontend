@@ -80,9 +80,10 @@ export function TechnicalSEOMetrics({ data }: { data: SEOAuditData }) {
   let schemas = [];
   let schemaCount = 0;
   const rawArray = data.technical.schemaValidation?.currentSchema;
-
+  
 if (rawArray && rawArray.length > 0) {
  
+  try{
   rawArray.forEach(item => {
     let parsed = typeof item === "string" ? JSON.parse(item) : item;
     if (Array.isArray(parsed["@graph"])) {
@@ -90,8 +91,10 @@ if (rawArray && rawArray.length > 0) {
     } else if (typeof parsed === "object") {
       schemas.push(parsed);
     }
-  });
-
+  }); 
+  }catch(error){
+      console.log("Failed to parse json item", error)
+  }
    schemaCount = schemas.length;
   console.log("Total schemas:", schemaCount);
 }

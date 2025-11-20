@@ -32,7 +32,7 @@ export function SchemaFullView({ data }: SchemaFullViewProps) {
 
   if (parseError) {
     return (
-      <div className="flex flex-col  bg-white">     
+      <div className="flex flex-col bg-white">     
           <p className="text-gray-300 text-sm">{parseError}</p>     
       </div>
     )
@@ -40,7 +40,6 @@ export function SchemaFullView({ data }: SchemaFullViewProps) {
 
   return (
     <div className="flex flex-col bg-white">
-      {/* Schemas */}
       <div className="p-8">
         <div className="max-w-7xl mx-auto space-y-4">
           {schemas.map((schema, index) => (
@@ -70,7 +69,6 @@ function SchemaAccordion({ schema, index, isOpen, onToggle }: SchemaAccordionPro
 
   return (
     <div className="border border-gray-300 rounded-lg overflow-hidden bg-white">
-      {/* Accordion Header */}
       <button
         onClick={onToggle}
         className="w-full px-6 py-4 bg-gray-50 hover:bg-gray-100 flex items-center justify-between border-b border-gray-300 transition-colors"
@@ -79,14 +77,13 @@ function SchemaAccordion({ schema, index, isOpen, onToggle }: SchemaAccordionPro
         <ChevronDown className={`h-5 w-5 text-black transition-transform ${isOpen ? "transform rotate-180" : ""}`} />
       </button>
 
-      {/* Accordion Content */}
       {isOpen && (
         <div className="px-6 py-6 bg-white">
           <div className="space-y-6">
             {Object.entries(schema)
               .filter(([key]) => !key.startsWith("@"))
               .map(([key, value], idx) => (
-                <PropertyRow key={idx} propertyKey={key} value={value} />
+                <PropertyRow key={idx} propertyKey={key} value={value} depth={0} />
               ))}
           </div>
         </div>
@@ -103,7 +100,59 @@ interface PropertyRowProps {
 
 function PropertyRow({ propertyKey, value, depth = 0 }: PropertyRowProps) {
   const isComplex = typeof value === "object" && value !== null
-  const paddingClass = depth > 0 ? "pl-6" : ""
+  const [isExpanded, setIsExpanded] = useState(depth === 0)
+  const paddingClass = depth > 0 ? `pl-${Math.min(depth * 4, 12)}` : ""
+
+  if (isComplex && (Array.isArray(value) || typeof value === "object")) {
+    return (
+      <div className={paddingClass}>
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="flex gap-2 items-start hover:opacity-70 transition-opacity"
+        >
+          <ChevronDown 
+            className={`h-4 w-4 text-black transition-transform flex-shrink-0 mt-1 ${isExpanded ? "transform rotate-180" : ""}`} 
+          />
+          <code className="text-sm font-mono font-semibold text-black break-words text-left">
+            {propertyKey}
+          </code>
+        </button>
+
+        {isExpanded && (
+          <div className="mt-3 ml-6 space-y-3 bg-gray-50 p-4 rounded border border-gray-300">
+            {Array.isArray(value) ? (
+              <div>
+                <p className="text-xs font-medium text-gray-600 mb-3">Array ({value.length} items)</p>
+                <div className="space-y-4">
+                  {value.map((item, idx) => (
+                    <div key={idx} className="space-y-2">
+                      {typeof item === "object" && item !== null ? (
+                        <div className="space-y-2">
+                          {Object.entries(item).map(([k, v]) => (
+                            <PropertyRow key={k} propertyKey={k} value={v} depth={depth + 2} />
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-sm text-gray-800">{formatDisplayValue(item)}</p>
+                      )}
+                      {idx < value.length - 1 && <hr className="border-gray-300" />}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {Object.entries(value).map(([k, v]) => (
+                  <PropertyRow key={k} propertyKey={k} value={v} depth={depth + 2} />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+        <hr className="border-gray-300 mt-6" />
+      </div>
+    )
+  }
 
   return (
     <div className={paddingClass}>
@@ -112,45 +161,7 @@ function PropertyRow({ propertyKey, value, depth = 0 }: PropertyRowProps) {
           <code className="text-sm font-mono font-semibold text-black break-words">{propertyKey}</code>
         </div>
         <div className="flex-1">
-          {isComplex ? (
-            <div className="space-y-3">
-              {Array.isArray(value) ? (
-                <div>
-                  <p className="text-xs font-medium text-gray-600 mb-2">Array ({value.length} items)</p>
-                  <div className="space-y-4 bg-gray-50 p-4 rounded border border-gray-300">
-                    {value.map((item, idx) => (
-                      <div key={idx} className="space-y-2">
-                        {typeof item === "object" && item !== null ? (
-                          <div className="space-y-2">
-                            {Object.entries(item).map(([k, v]) => (
-                              <div key={k} className="flex gap-4">
-                                <code className="text-xs font-mono text-gray-700 min-w-32">{k}:</code>
-                                <span className="text-sm text-gray-800">{formatDisplayValue(v)}</span>
-                              </div>
-                            ))}
-                          </div>
-                        ) : (
-                          <p className="text-sm text-gray-800">{formatDisplayValue(item)}</p>
-                        )}
-                        {idx < value.length - 1 && <hr className="border-gray-300" />}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ) : (
-                <div className="bg-gray-50 p-4 rounded border border-gray-300 space-y-2">
-                  {Object.entries(value).map(([k, v]) => (
-                    <div key={k} className="flex gap-4">
-                      <code className="text-xs font-mono text-gray-700 min-w-32">{k}:</code>
-                      <span className="text-sm text-gray-800 break-words">{formatDisplayValue(v)}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          ) : (
-            <p className="text-sm text-gray-800 break-words">{formatDisplayValue(value)}</p>
-          )}
+          <p className="text-sm text-gray-800 break-words">{formatDisplayValue(value)}</p>
         </div>
       </div>
       <hr className="border-gray-300 mt-6" />
