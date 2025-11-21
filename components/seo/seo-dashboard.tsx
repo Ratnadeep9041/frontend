@@ -252,22 +252,18 @@ export function SEODashboard() {
 
         {/* Tabs */}
         <Tabs defaultValue="technical" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-8">
+          <TabsList className="grid w-full grid-cols-2 mb-8">
             <TabsTrigger value="technical">Technical</TabsTrigger>
             <TabsTrigger value="performance">Performance</TabsTrigger>
-            <TabsTrigger value="links">Links & Images</TabsTrigger>
           </TabsList>
 
           <TabsContent value="technical" className="space-y-6">
             <TechnicalSEOMetrics data={data} />
+            <LinksAndImagesAnalysis data={data} />
           </TabsContent>
 
           <TabsContent value="performance" className="space-y-6">
             <PerformanceScores data={data} />
-          </TabsContent>
-
-          <TabsContent value="links" className="space-y-6">
-            <LinksAndImagesAnalysis data={data} />
           </TabsContent>
         </Tabs>
       </div>

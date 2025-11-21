@@ -28,7 +28,7 @@ export function SchemaFullView({ data }: SchemaFullViewProps) {
     parseError = "Invalid JSON format"
   }
 
-  const [openIndex, setOpenIndex] = useState<number | null>(0)
+  const [openIndex, setOpenIndex] = useState<number | null>(null)
 
   if (parseError) {
     return (
